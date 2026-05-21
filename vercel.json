@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/kyc",
+      "destination": "https://script.google.com/macros/s/AKfycby3tChJKpEBWd-D-n3uoQC6UgZHqbpZhNZPaejucZOY-TFUyORjkRK0uAMWPmYdDIAP/exec"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

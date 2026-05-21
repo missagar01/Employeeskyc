@@ -43,7 +43,7 @@ const INDIAN_STATES = [
 function App() {
   const [step, setStep] = useState(1);
   const [scriptUrl, setScriptUrl] = useState(() => {
-    return import.meta.env.VITE_GOOGLE_SCRIPT_URL || localStorage.getItem('kyc_script_url') || '';
+    return import.meta.env.VITE_GOOGLE_SCRIPT_URL || localStorage.getItem('kyc_script_url') || '/api/kyc';
   });
   
   const [formData, setFormData] = useState({
