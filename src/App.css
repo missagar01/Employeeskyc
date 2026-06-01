@@ -1,4 +1,15 @@
 .kyc-container {
+  --card-bg: #f0f9ff;
+  --card-border: #bae6fd;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --primary: #0284c7;
+  --primary-hover: #0369a1;
+  --primary-glow: rgba(14, 165, 233, 0.15);
+  --secondary: #0ea5e9;
+
   width: 100%;
   max-width: 850px;
   background: var(--card-bg);
@@ -7,13 +18,116 @@
   border: 1px solid var(--card-border);
   border-radius: 24px;
   padding: 2.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 
-              0 0 40px rgba(139, 92, 246, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1), 
+              0 0 40px rgba(14, 165, 233, 0.05);
   position: relative;
   overflow: hidden;
   transition: var(--transition);
   animation: fadeIn 0.8s ease-out;
 }
+
+/* Light Blue Theme Adjustments */
+.kyc-container .kyc-header h1 {
+  background: linear-gradient(135deg, #0f172a 0%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.kyc-container .kyc-steps::before {
+  background: #cbd5e1;
+}
+
+.kyc-container .step-node {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.kyc-container .step-node.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #e0f2fe;
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.kyc-container .step-node.completed {
+  border-color: var(--success);
+  background: var(--success);
+  color: white;
+}
+
+.kyc-container .input-field {
+  color: #0f172a;
+}
+
+.kyc-container .input-field:focus {
+  background: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+.kyc-container .input-field::placeholder {
+  color: #94a3b8;
+}
+
+.kyc-container select.input-field option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.kyc-container .checkmark {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.kyc-container .checkbox-container {
+  color: #475569;
+}
+
+.kyc-container .upload-zone {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.kyc-container .upload-zone:hover {
+  border-color: var(--primary);
+  background: #f0f9ff;
+}
+
+.kyc-container .upload-hint {
+  color: #64748b;
+}
+
+.kyc-container .file-preview-card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+
+.kyc-container .config-panel {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+
+.kyc-container .review-section {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+
+.kyc-container .review-section-title {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.kyc-container .btn-secondary {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.kyc-container .btn-secondary:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
 
 @keyframes fadeIn {
   from {

@@ -48,6 +48,7 @@ function App() {
   
   const [formData, setFormData] = useState({
     fullName: '',
+    employeeCode: '',
     email: '',
     phone: '',
     dob: '',
@@ -82,11 +83,6 @@ function App() {
     otherDocPhotoName: '',
     otherDocPhotoType: '',
     otherDocPhotoSize: '',
-    // Signature
-    signatureBase64: '',
-    signatureName: '',
-    signatureType: '',
-    signatureSize: '',
     // Bank Details
     bankHolderName: '',
     bankName: '',
@@ -193,12 +189,12 @@ function App() {
     const tempErrors = {};
     
     if (step === 1) {
+      if (!formData.employeeCode.trim()) tempErrors.employeeCode = 'Employee Code is required';
       if (!formData.fullName.trim()) tempErrors.fullName = 'Full Name is required';
       else if (formData.fullName.trim().length < 3) tempErrors.fullName = 'Name must be at least 3 characters';
       
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!formData.email.trim()) tempErrors.email = 'Email is required';
-      else if (!emailRegex.test(formData.email)) tempErrors.email = 'Enter a valid email address';
+      if (formData.email.trim() && !emailRegex.test(formData.email)) tempErrors.email = 'Enter a valid email address';
       
       const phoneRegex = /^[6-9]\d{9}$/;
       if (!formData.phone.trim()) tempErrors.phone = 'Phone number is required';
@@ -212,9 +208,7 @@ function App() {
       // Permanent Address
       if (!formData.permStreet.trim()) tempErrors.permStreet = 'Street Address is required';
       if (!formData.permVillage.trim()) tempErrors.permVillage = 'Village is required';
-      if (!formData.permPostOffice.trim()) tempErrors.permPostOffice = 'Post Office is required';
       if (!formData.permCity.trim()) tempErrors.permCity = 'City is required';
-      if (!formData.permBlock.trim()) tempErrors.permBlock = 'Block/Tehsil is required';
       if (!formData.permDistrict.trim()) tempErrors.permDistrict = 'District is required';
       if (!formData.permState.trim()) tempErrors.permState = 'State is required';
       
@@ -222,9 +216,7 @@ function App() {
       if (!formData.isSameAddress) {
         if (!formData.currStreet.trim()) tempErrors.currStreet = 'Street Address is required';
         if (!formData.currVillage.trim()) tempErrors.currVillage = 'Village is required';
-        if (!formData.currPostOffice.trim()) tempErrors.currPostOffice = 'Post Office is required';
         if (!formData.currCity.trim()) tempErrors.currCity = 'City is required';
-        if (!formData.currBlock.trim()) tempErrors.currBlock = 'Block/Tehsil is required';
         if (!formData.currDistrict.trim()) tempErrors.currDistrict = 'District is required';
         if (!formData.currState.trim()) tempErrors.currState = 'State is required';
       }
@@ -258,11 +250,6 @@ function App() {
         if (!formData.otherDocPhotoBase64) {
           tempErrors.otherDocPhoto = 'Please upload the document copy';
         }
-      }
-
-      // Signature copy (Mandatory)
-      if (!formData.signatureBase64) {
-        tempErrors.signature = 'Signature verification photo is required';
       }
     } 
     
@@ -303,6 +290,10 @@ function App() {
   // Submit Data to Google Sheets API (Apps Script)
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (step < 5) {
+      nextStep();
+      return;
+    }
     if (!scriptUrl) {
       alert("Please configure the Google Apps Script Web App URL (VITE_GOOGLE_SCRIPT_URL) in your .env file.");
       return;
@@ -346,6 +337,7 @@ function App() {
   const resetForm = () => {
     setFormData({
       fullName: '',
+      employeeCode: '',
       email: '',
       phone: '',
       dob: '',
@@ -376,10 +368,6 @@ function App() {
       otherDocPhotoName: '',
       otherDocPhotoType: '',
       otherDocPhotoSize: '',
-      signatureBase64: '',
-      signatureName: '',
-      signatureType: '',
-      signatureSize: '',
       bankHolderName: '',
       bankName: '',
       accountNumber: '',
@@ -458,8 +446,22 @@ function App() {
                   {errors.fullName && <span className="error-message">{errors.fullName}</span>}
                 </div>
 
+                <div className="input-group grid-full-width">
+                  <label htmlFor="employeeCode">Employee Code <span>*</span></label>
+                  <input
+                    type="text"
+                    id="employeeCode"
+                    name="employeeCode"
+                    placeholder="Enter your Employee Code (e.g. EMP123)"
+                    className={`input-field ${errors.employeeCode ? 'input-error' : ''}`}
+                    value={formData.employeeCode}
+                    onChange={handleInputChange}
+                  />
+                  {errors.employeeCode && <span className="error-message">{errors.employeeCode}</span>}
+                </div>
+
                 <div className="input-group">
-                  <label htmlFor="email">Email Address <span>*</span></label>
+                  <label htmlFor="email">Email Address</label>
                   <input
                     type="email"
                     id="email"
@@ -560,7 +562,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="permPostOffice">Post Office <span>*</span></label>
+                  <label htmlFor="permPostOffice">Post Office</label>
                   <input
                     type="text"
                     id="permPostOffice"
@@ -588,7 +590,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="permBlock">Block / Tehsil <span>*</span></label>
+                  <label htmlFor="permBlock">Block / Tehsil</label>
                   <input
                     type="text"
                     id="permBlock"
@@ -682,7 +684,7 @@ function App() {
                     </div>
 
                     <div className="input-group">
-                      <label htmlFor="currPostOffice">Post Office <span>*</span></label>
+                      <label htmlFor="currPostOffice">Post Office</label>
                       <input
                         type="text"
                         id="currPostOffice"
@@ -710,7 +712,7 @@ function App() {
                     </div>
 
                     <div className="input-group">
-                      <label htmlFor="currBlock">Block / Tehsil <span>*</span></label>
+                      <label htmlFor="currBlock">Block / Tehsil</label>
                       <input
                         type="text"
                         id="currBlock"
@@ -895,44 +897,6 @@ function App() {
                   {errors.otherDocPhoto && <span className="error-message">{errors.otherDocPhoto}</span>}
                 </div>
 
-                {/* Section C: Signature Upload (Mandatory) */}
-                <div className="input-group grid-full-width" style={{ marginTop: '1.5rem' }}>
-                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>Signature Verification (Mandatory)</h3>
-                </div>
-
-                <div className="input-group grid-full-width">
-                  <label>Upload Signature Copy (Clear Image) <span>*</span></label>
-                  {!formData.signatureBase64 ? (
-                    <div className="upload-zone" onClick={() => document.getElementById('signatureInput').click()}>
-                      <svg className="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                      <p className="upload-text">Drag and drop file or <span>browse</span> to upload signature</p>
-                      <p className="upload-hint">Max file size: 2.5 MB</p>
-                      <input 
-                        type="file" 
-                        id="signatureInput" 
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={(e) => handleFileChange(e, 'signature')}
-                      />
-                    </div>
-                  ) : (
-                    <div className="file-preview-card">
-                      <img src={formData.signatureBase64} alt="Signature preview" className="file-preview-thumb" />
-                      <div className="file-preview-info">
-                        <div className="file-preview-name">{formData.signatureName}</div>
-                        <div className="file-preview-size">{formData.signatureSize}</div>
-                      </div>
-                      <button type="button" className="btn-remove-file" onClick={() => removeFile('signature')}>
-                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
-                  {errors.signature && <span className="error-message">{errors.signature}</span>}
-                </div>
 
               </div>
             </div>
@@ -978,7 +942,7 @@ function App() {
                 <div className="input-group">
                   <label htmlFor="accountNumber">Account Number <span>*</span></label>
                   <input
-                    type="password"
+                    type="text"
                     id="accountNumber"
                     name="accountNumber"
                     placeholder="Enter savings/current bank account no"
@@ -1070,8 +1034,12 @@ function App() {
                       <span className="review-value">{formData.fullName}</span>
                     </div>
                     <div className="review-item">
+                      <span className="review-label">Employee Code</span>
+                      <span className="review-value">{formData.employeeCode}</span>
+                    </div>
+                    <div className="review-item">
                       <span className="review-label">Email Address</span>
-                      <span className="review-value">{formData.email}</span>
+                      <span className="review-value">{formData.email || 'N/A'}</span>
                     </div>
                     <div className="review-item">
                       <span className="review-label">Phone Number</span>
@@ -1137,10 +1105,7 @@ function App() {
                       </>
                     )}
 
-                    <div className="review-item grid-full-width" style={{ borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
-                      <span className="review-label">Signature Attachment</span>
-                      <span className="review-value">📎 {formData.signatureName} ({formData.signatureSize})</span>
-                    </div>
+
                   </div>
                 </div>
 

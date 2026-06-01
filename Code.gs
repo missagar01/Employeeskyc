@@ -23,6 +23,7 @@ function doPost(e) {
       var headers = [
         "Timestamp", 
         "Full Name", 
+        "Employee Code",
         "Email", 
         "Phone", 
         "Date of Birth", 
@@ -37,7 +38,6 @@ function doPost(e) {
         "Other Document Type",
         "Other Document Number",
         "Other Document Drive Link",
-        "Signature Drive Link",
         // Bank Details
         "Bank Account Holder", "Bank Name", "Account Number", "IFSC Code", 
         // Emergency Details
@@ -94,15 +94,13 @@ function doPost(e) {
       otherDocUrl = uploadFile(data.otherDocPhotoBase64, sanitizedName + "_" + docType, data.otherDocPhotoType || "image/png");
     }
     
-    // Upload Signature photo
-    if (data.signatureBase64) {
-      signatureUrl = uploadFile(data.signatureBase64, sanitizedName + "_Signature", data.signatureType || "image/png");
-    }
+
     
     // Prepare row data
     var row = [
       new Date(), // Timestamp
       data.fullName || "",
+      data.employeeCode || "",
       data.email || "",
       data.phone || "",
       data.dob || "",
@@ -129,7 +127,6 @@ function doPost(e) {
       data.otherDocType || "",
       data.otherDocNumber || "",
       otherDocUrl,
-      signatureUrl,
       // Bank & Emergency
       data.bankHolderName || "",
       data.bankName || "",
