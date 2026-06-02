@@ -1144,7 +1144,7 @@ function App() {
           {step <= 5 && (
             <div className="form-actions">
               {step > 1 ? (
-                <button type="button" className="btn btn-secondary" onClick={prevStep} disabled={isSubmitting}>
+                <button key="btn-back" type="button" className="btn btn-secondary" onClick={prevStep} disabled={isSubmitting}>
                   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                   </svg>
@@ -1155,14 +1155,14 @@ function App() {
               )}
 
               {step < 5 ? (
-                <button type="button" className="btn btn-primary" onClick={nextStep}>
+                <button key="btn-next" type="button" className="btn btn-primary" onClick={nextStep}>
                   Next Step
                   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
               ) : (
-                <button type="submit" className="btn btn-primary" disabled={isSubmitting || !scriptUrl}>
+                <button key="btn-submit" type="submit" className="btn btn-primary" disabled={isSubmitting || !scriptUrl}>
                   {isSubmitting ? (
                     <>
                       <div className="spinner"></div>
