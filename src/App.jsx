@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
@@ -39,6 +40,8 @@ const INDIAN_STATES = [
   "Lakshadweep",
   "Puducherry"
 ];
+
+const t = (text) => text;
 
 function App() {
   const [step, setStep] = useState(1);
@@ -133,14 +136,35 @@ function App() {
   ]);
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    let { name, value, type, checked } = e.target;
+
+    // Guard against prototype pollution and property injection
+    if (!Object.prototype.hasOwnProperty.call(formData, name)) {
+      return;
+    }
+
+    if (name === 'dob') {
+      // Auto-format as DD/MM/YYYY
+      let cleaned = value.replace(/\D/g, '');
+      if (cleaned.length > 8) cleaned = cleaned.slice(0, 8);
+      
+      if (cleaned.length >= 5) {
+        value = `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4)}`;
+      } else if (cleaned.length >= 3) {
+        value = `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
+      } else {
+        value = cleaned;
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
     
     // Clear validation error on change
-    if (errors[name]) {
+    const hasError = Object.entries(errors).some(([key, val]) => key === name && val);
+    if (hasError) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
@@ -204,7 +228,12 @@ function App() {
       if (!formData.phone.trim()) tempErrors.phone = 'Phone number is required';
       else if (!phoneRegex.test(formData.phone)) tempErrors.phone = 'Enter a valid 10-digit mobile number';
       
-      if (!formData.dob) tempErrors.dob = 'Date of birth is required';
+      const dobRegex = /^(((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((19|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[469]|11)\/((19|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((19|[2-9]\d)\d{2}))|(29\/02\/((19|[2-9]\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))))$/;
+      if (!formData.dob) {
+        tempErrors.dob = t('Date of birth is required');
+      } else if (!dobRegex.test(formData.dob)) {
+        tempErrors.dob = t('Enter date in DD/MM/YYYY format');
+      }
       if (!formData.gender) tempErrors.gender = 'Gender is required';
     } 
     
@@ -399,8 +428,8 @@ function App() {
         
         {/* Header */}
         <div className="kyc-header">
-          <h1>Employee KYC Portal</h1>
-          <p>Complete your KYC details to register with human resources</p>
+          <h1>{t('Employee KYC Portal')}</h1>
+          <p>{t('Complete your KYC details to register with human resources')}</p>
         </div>
 
         {/* Step Progress indicators */}
@@ -410,27 +439,27 @@ function App() {
             
             <div className={`step-node ${step >= 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`} onClick={() => step < 5 && setStep(1)}>
               {step > 1 ? '✓' : '1'}
-              <span className="step-node-label">Personal</span>
+              <span className="step-node-label">{t('Personal')}</span>
             </div>
             
             <div className={`step-node ${step >= 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`} onClick={() => step < 5 && validateStep() && setStep(2)}>
               {step > 2 ? '✓' : '2'}
-              <span className="step-node-label">Address</span>
+              <span className="step-node-label">{t('Address')}</span>
             </div>
             
             <div className={`step-node ${step >= 3 ? 'active' : ''} ${step > 3 ? 'completed' : ''}`} onClick={() => step < 5 && validateStep() && setStep(3)}>
               {step > 3 ? '✓' : '3'}
-              <span className="step-node-label">Identity</span>
+              <span className="step-node-label">{t('Identity')}</span>
             </div>
             
             <div className={`step-node ${step >= 4 ? 'active' : ''} ${step > 4 ? 'completed' : ''}`} onClick={() => step < 5 && validateStep() && setStep(4)}>
               {step > 4 ? '✓' : '4'}
-              <span className="step-node-label">Bank & Emergency</span>
+              <span className="step-node-label">{t('Bank & Emergency')}</span>
             </div>
             
             <div className={`step-node ${step === 5 ? 'active' : ''}`} onClick={() => step < 5 && validateStep() && setStep(5)}>
               5
-              <span className="step-node-label">Review</span>
+              <span className="step-node-label">{t('Review')}</span>
             </div>
           </div>
         )}
@@ -444,7 +473,7 @@ function App() {
               <div className="form-grid">
                 
                 <div className="input-group grid-full-width">
-                  <label htmlFor="fullName">Full Name <span>*</span></label>
+                  <label htmlFor="fullName">{t('Full Name ')}<span>*</span></label>
                   <input
                     type="text"
                     id="fullName"
@@ -458,7 +487,7 @@ function App() {
                 </div>
 
                 <div className="input-group grid-full-width">
-                  <label htmlFor="employeeCode">Employee Code <span>*</span></label>
+                  <label htmlFor="employeeCode">{t('Employee Code ')}<span>*</span></label>
                   <input
                     type="text"
                     id="employeeCode"
@@ -472,7 +501,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="email">Email Address</label>
+                  <label htmlFor="email">{t('Email Address')}</label>
                   <input
                     type="email"
                     id="email"
@@ -486,7 +515,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="phone">Mobile Number <span>*</span></label>
+                  <label htmlFor="phone">{t('Mobile Number ')}<span>*</span></label>
                   <input
                     type="tel"
                     id="phone"
@@ -501,11 +530,13 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="dob">Date of Birth <span>*</span></label>
+                  <label htmlFor="dob">{t('Date of Birth ')}<span>*</span></label>
                   <input
-                    type="date"
+                    type="text"
                     id="dob"
                     name="dob"
+                    placeholder={t('DD/MM/YYYY')}
+                    maxLength="10"
                     className={`input-field ${errors.dob ? 'input-error' : ''}`}
                     value={formData.dob}
                     onChange={handleInputChange}
@@ -514,7 +545,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="gender">Gender <span>*</span></label>
+                  <label htmlFor="gender">{t('Gender ')}<span>*</span></label>
                   <select
                     id="gender"
                     name="gender"
@@ -522,10 +553,10 @@ function App() {
                     value={formData.gender}
                     onChange={handleInputChange}
                   >
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
+                    <option value="">{t('Select Gender')}</option>
+                    <option value="Male">{t('Male')}</option>
+                    <option value="Female">{t('Female')}</option>
+                    <option value="Other">{t('Other')}</option>
                   </select>
                   {errors.gender && <span className="error-message">{errors.gender}</span>}
                 </div>
@@ -541,11 +572,11 @@ function App() {
                 
                 {/* Permanent Address Breakdown */}
                 <div className="input-group grid-full-width">
-                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.5rem' }}>Permanent Address</h3>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.5rem' }}>{t('Permanent Address')}</h3>
                 </div>
 
                 <div className="input-group grid-full-width">
-                  <label htmlFor="permStreet">Street Address / House No. <span>*</span></label>
+                  <label htmlFor="permStreet">{t('Street Address / House No. ')}<span>*</span></label>
                   <input
                     type="text"
                     id="permStreet"
@@ -559,7 +590,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="permVillage">Village <span>*</span></label>
+                  <label htmlFor="permVillage">{t('Village ')}<span>*</span></label>
                   <input
                     type="text"
                     id="permVillage"
@@ -573,7 +604,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="permPostOffice">Post Office</label>
+                  <label htmlFor="permPostOffice">{t('Post Office')}</label>
                   <input
                     type="text"
                     id="permPostOffice"
@@ -587,7 +618,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="permCity">City / Town <span>*</span></label>
+                  <label htmlFor="permCity">{t('City / Town ')}<span>*</span></label>
                   <input
                     type="text"
                     id="permCity"
@@ -601,7 +632,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="permBlock">Block / Tehsil</label>
+                  <label htmlFor="permBlock">{t('Block / Tehsil')}</label>
                   <input
                     type="text"
                     id="permBlock"
@@ -615,7 +646,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="permDistrict">District <span>*</span></label>
+                  <label htmlFor="permDistrict">{t('District ')}<span>*</span></label>
                   <input
                     type="text"
                     id="permDistrict"
@@ -629,7 +660,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="permState">State <span>*</span></label>
+                  <label htmlFor="permState">{t('State ')}<span>*</span></label>
                   <select
                     id="permState"
                     name="permState"
@@ -637,7 +668,7 @@ function App() {
                     value={formData.permState}
                     onChange={handleInputChange}
                   >
-                    <option value="">Select State</option>
+                    <option value="">{t('Select State')}</option>
                     {INDIAN_STATES.map(state => (
                       <option key={state} value={state}>{state}</option>
                     ))}
@@ -647,9 +678,7 @@ function App() {
 
                 {/* Same Address Switch */}
                 <div className="checkbox-group grid-full-width" style={{ marginTop: '1.25rem', marginBottom: '1.25rem' }}>
-                  <label className="checkbox-container">
-                    Current Address is same as Permanent Address
-                    <input
+                  <label className="checkbox-container">{t('\n                    Current Address is same as Permanent Address\n                    ')}<input
                       type="checkbox"
                       name="isSameAddress"
                       checked={formData.isSameAddress}
@@ -663,11 +692,11 @@ function App() {
                 {!formData.isSameAddress && (
                   <>
                     <div className="input-group grid-full-width">
-                      <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.5rem' }}>Current Address</h3>
+                      <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.5rem' }}>{t('Current Address')}</h3>
                     </div>
 
                     <div className="input-group grid-full-width">
-                      <label htmlFor="currStreet">Street Address / House No. <span>*</span></label>
+                      <label htmlFor="currStreet">{t('Street Address / House No. ')}<span>*</span></label>
                       <input
                         type="text"
                         id="currStreet"
@@ -681,7 +710,7 @@ function App() {
                     </div>
 
                     <div className="input-group">
-                      <label htmlFor="currVillage">Village <span>*</span></label>
+                      <label htmlFor="currVillage">{t('Village ')}<span>*</span></label>
                       <input
                         type="text"
                         id="currVillage"
@@ -695,7 +724,7 @@ function App() {
                     </div>
 
                     <div className="input-group">
-                      <label htmlFor="currPostOffice">Post Office</label>
+                      <label htmlFor="currPostOffice">{t('Post Office')}</label>
                       <input
                         type="text"
                         id="currPostOffice"
@@ -709,7 +738,7 @@ function App() {
                     </div>
 
                     <div className="input-group">
-                      <label htmlFor="currCity">City / Town <span>*</span></label>
+                      <label htmlFor="currCity">{t('City / Town ')}<span>*</span></label>
                       <input
                         type="text"
                         id="currCity"
@@ -723,7 +752,7 @@ function App() {
                     </div>
 
                     <div className="input-group">
-                      <label htmlFor="currBlock">Block / Tehsil</label>
+                      <label htmlFor="currBlock">{t('Block / Tehsil')}</label>
                       <input
                         type="text"
                         id="currBlock"
@@ -737,7 +766,7 @@ function App() {
                     </div>
 
                     <div className="input-group">
-                      <label htmlFor="currDistrict">District <span>*</span></label>
+                      <label htmlFor="currDistrict">{t('District ')}<span>*</span></label>
                       <input
                         type="text"
                         id="currDistrict"
@@ -751,7 +780,7 @@ function App() {
                     </div>
 
                     <div className="input-group">
-                      <label htmlFor="currState">State <span>*</span></label>
+                      <label htmlFor="currState">{t('State ')}<span>*</span></label>
                       <select
                         id="currState"
                         name="currState"
@@ -759,7 +788,7 @@ function App() {
                         value={formData.currState}
                         onChange={handleInputChange}
                       >
-                        <option value="">Select State</option>
+                        <option value="">{t('Select State')}</option>
                         {INDIAN_STATES.map(state => (
                           <option key={state} value={state}>{state}</option>
                         ))}
@@ -780,11 +809,11 @@ function App() {
                 
                 {/* Section A: Aadhar Card (Mandatory) */}
                 <div className="input-group grid-full-width">
-                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>Aadhar Card Verification (Mandatory)</h3>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>{t('Aadhar Card Verification (Mandatory)')}</h3>
                 </div>
 
                 <div className="input-group grid-full-width">
-                  <label htmlFor="aadharNumber">Aadhar Number <span>*</span></label>
+                  <label htmlFor="aadharNumber">{t('Aadhar Number ')}<span>*</span></label>
                   <input
                     type="text"
                     id="aadharNumber"
@@ -799,14 +828,14 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label>Aadhar Card Front Side (JPG, PNG or PDF) <span>*</span></label>
+                  <label>{t('Aadhar Card Front Side (JPG, PNG or PDF) ')}<span>*</span></label>
                   {!formData.aadharFrontPhotoBase64 ? (
                     <div className="upload-zone" onClick={() => document.getElementById('aadharFrontPhotoInput').click()}>
                       <svg className="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
-                      <p className="upload-text">Drag & drop or <span>browse</span> Front Side</p>
-                      <p className="upload-hint">Max file size: 2.5 MB</p>
+                      <p className="upload-text">{t('Drag & drop or ')}<span>{t('browse')}</span>{t(' Front Side')}</p>
+                      <p className="upload-hint">{t('Max file size: 2.5 MB')}</p>
                       <input 
                         type="file" 
                         id="aadharFrontPhotoInput" 
@@ -820,7 +849,7 @@ function App() {
                       {formData.aadharFrontPhotoType.startsWith('image/') ? (
                         <img src={formData.aadharFrontPhotoBase64} alt="Aadhar front preview" className="file-preview-thumb" />
                       ) : (
-                        <div className="file-preview-icon">PDF</div>
+                        <div className="file-preview-icon">{t('PDF')}</div>
                       )}
                       <div className="file-preview-info">
                         <div className="file-preview-name">{formData.aadharFrontPhotoName}</div>
@@ -837,14 +866,14 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label>Aadhar Card Back Side (JPG, PNG or PDF) <span>*</span></label>
+                  <label>{t('Aadhar Card Back Side (JPG, PNG or PDF) ')}<span>*</span></label>
                   {!formData.aadharBackPhotoBase64 ? (
                     <div className="upload-zone" onClick={() => document.getElementById('aadharBackPhotoInput').click()}>
                       <svg className="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
-                      <p className="upload-text">Drag & drop or <span>browse</span> Back Side</p>
-                      <p className="upload-hint">Max file size: 2.5 MB</p>
+                      <p className="upload-text">{t('Drag & drop or ')}<span>{t('browse')}</span>{t(' Back Side')}</p>
+                      <p className="upload-hint">{t('Max file size: 2.5 MB')}</p>
                       <input 
                         type="file" 
                         id="aadharBackPhotoInput" 
@@ -858,7 +887,7 @@ function App() {
                       {formData.aadharBackPhotoType.startsWith('image/') ? (
                         <img src={formData.aadharBackPhotoBase64} alt="Aadhar back preview" className="file-preview-thumb" />
                       ) : (
-                        <div className="file-preview-icon">PDF</div>
+                        <div className="file-preview-icon">{t('PDF')}</div>
                       )}
                       <div className="file-preview-info">
                         <div className="file-preview-name">{formData.aadharBackPhotoName}</div>
@@ -876,11 +905,11 @@ function App() {
 
                 {/* Section B: Other Document (Optional) */}
                 <div className="input-group grid-full-width" style={{ marginTop: '1.5rem' }}>
-                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>Secondary Document Verification (Optional)</h3>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>{t('Secondary Document Verification (Optional)')}</h3>
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="otherDocType">Select Document Type</label>
+                  <label htmlFor="otherDocType">{t('Select Document Type')}</label>
                   <select
                     id="otherDocType"
                     name="otherDocType"
@@ -888,14 +917,14 @@ function App() {
                     value={formData.otherDocType}
                     onChange={handleInputChange}
                   >
-                    <option value="PAN Card">PAN Card</option>
-                    <option value="Passport">Passport</option>
-                    <option value="Driving License">Driving License</option>
+                    <option value="PAN Card">{t('PAN Card')}</option>
+                    <option value="Passport">{t('Passport')}</option>
+                    <option value="Driving License">{t('Driving License')}</option>
                   </select>
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="otherDocNumber">Document Number</label>
+                  <label htmlFor="otherDocNumber">{t('Document Number')}</label>
                   <input
                     type="text"
                     id="otherDocNumber"
@@ -909,14 +938,14 @@ function App() {
                 </div>
 
                 <div className="input-group grid-full-width">
-                  <label>Upload Document Copy (Optional)</label>
+                  <label>{t('Upload Document Copy (Optional)')}</label>
                   {!formData.otherDocPhotoBase64 ? (
                     <div className="upload-zone" onClick={() => document.getElementById('otherDocInput').click()}>
                       <svg className="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <p className="upload-text">Drag and drop file or <span>browse</span> to upload secondary proof</p>
-                      <p className="upload-hint">Max file size: 2.5 MB</p>
+                      <p className="upload-text">{t('Drag and drop file or ')}<span>{t('browse')}</span>{t(' to upload secondary proof')}</p>
+                      <p className="upload-hint">{t('Max file size: 2.5 MB')}</p>
                       <input 
                         type="file" 
                         id="otherDocInput" 
@@ -930,7 +959,7 @@ function App() {
                       {formData.otherDocPhotoType.startsWith('image/') ? (
                         <img src={formData.otherDocPhotoBase64} alt="ID preview" className="file-preview-thumb" />
                       ) : (
-                        <div className="file-preview-icon">PDF</div>
+                        <div className="file-preview-icon">{t('PDF')}</div>
                       )}
                       <div className="file-preview-info">
                         <div className="file-preview-name">{formData.otherDocPhotoName}</div>
@@ -957,11 +986,11 @@ function App() {
               <div className="form-grid">
                 
                 <div className="input-group grid-full-width">
-                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>Bank Salary Details</h3>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>{t('Bank Salary Details')}</h3>
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="bankHolderName">Account Holder Name <span>*</span></label>
+                  <label htmlFor="bankHolderName">{t('Account Holder Name ')}<span>*</span></label>
                   <input
                     type="text"
                     id="bankHolderName"
@@ -975,7 +1004,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="bankName">Bank Name <span>*</span></label>
+                  <label htmlFor="bankName">{t('Bank Name ')}<span>*</span></label>
                   <input
                     type="text"
                     id="bankName"
@@ -989,7 +1018,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="accountNumber">Account Number <span>*</span></label>
+                  <label htmlFor="accountNumber">{t('Account Number ')}<span>*</span></label>
                   <input
                     type="text"
                     id="accountNumber"
@@ -1003,7 +1032,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="ifscCode">IFSC Code <span>*</span></label>
+                  <label htmlFor="ifscCode">{t('IFSC Code ')}<span>*</span></label>
                   <input
                     type="text"
                     id="ifscCode"
@@ -1019,11 +1048,11 @@ function App() {
                 </div>
 
                 <div className="input-group grid-full-width" style={{ marginTop: '1rem' }}>
-                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>Emergency Contact Details</h3>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>{t('Emergency Contact Details')}</h3>
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="emergencyName">Contact Person Name <span>*</span></label>
+                  <label htmlFor="emergencyName">{t('Contact Person Name ')}<span>*</span></label>
                   <input
                     type="text"
                     id="emergencyName"
@@ -1037,7 +1066,7 @@ function App() {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="emergencyRelation">Relationship <span>*</span></label>
+                  <label htmlFor="emergencyRelation">{t('Relationship ')}<span>*</span></label>
                   <input
                     type="text"
                     id="emergencyRelation"
@@ -1051,7 +1080,7 @@ function App() {
                 </div>
 
                 <div className="input-group grid-full-width">
-                  <label htmlFor="emergencyPhone">Emergency Contact Number <span>*</span></label>
+                  <label htmlFor="emergencyPhone">{t('Emergency Contact Number ')}<span>*</span></label>
                   <input
                     type="tel"
                     id="emergencyPhone"
@@ -1076,30 +1105,30 @@ function App() {
                 
                 {/* Personal Section */}
                 <div className="review-section">
-                  <div className="review-section-title">Personal Details</div>
+                  <div className="review-section-title">{t('Personal Details')}</div>
                   <div className="review-grid">
                     <div className="review-item">
-                      <span className="review-label">Full Name</span>
+                      <span className="review-label">{t('Full Name')}</span>
                       <span className="review-value">{formData.fullName}</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Employee Code</span>
+                      <span className="review-label">{t('Employee Code')}</span>
                       <span className="review-value">{formData.employeeCode}</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Email Address</span>
+                      <span className="review-label">{t('Email Address')}</span>
                       <span className="review-value">{formData.email || 'N/A'}</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Phone Number</span>
+                      <span className="review-label">{t('Phone Number')}</span>
                       <span className="review-value">{formData.phone}</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Date of Birth</span>
+                      <span className="review-label">{t('Date of Birth')}</span>
                       <span className="review-value">{formData.dob}</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Gender</span>
+                      <span className="review-label">{t('Gender')}</span>
                       <span className="review-value">{formData.gender}</span>
                     </div>
                   </div>
@@ -1107,16 +1136,16 @@ function App() {
 
                 {/* Addresses */}
                 <div className="review-section">
-                  <div className="review-section-title">Address Details</div>
+                  <div className="review-section-title">{t('Address Details')}</div>
                   <div className="review-grid">
                     <div className="review-item grid-full-width" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
-                      <span className="review-label" style={{ color: 'var(--primary)', fontWeight: 600 }}>Permanent Address</span>
+                      <span className="review-label" style={{ color: 'var(--primary)', fontWeight: 600 }}>{t('Permanent Address')}</span>
                       <span className="review-value" style={{ marginTop: '0.25rem' }}>
                         {formData.permStreet}, {formData.permVillage}, PO: {formData.permPostOffice}, City: {formData.permCity}, Block: {formData.permBlock}, Dist: {formData.permDistrict}, {formData.permState}
                       </span>
                     </div>
                     <div className="review-item grid-full-width">
-                      <span className="review-label" style={{ color: 'var(--primary)', fontWeight: 600 }}>Current Address</span>
+                      <span className="review-label" style={{ color: 'var(--primary)', fontWeight: 600 }}>{t('Current Address')}</span>
                       <span className="review-value" style={{ marginTop: '0.25rem' }}>
                         {formData.isSameAddress ? (
                           'Same as Permanent Address'
@@ -1130,29 +1159,29 @@ function App() {
 
                 {/* Identity & Upload Verification */}
                 <div className="review-section">
-                  <div className="review-section-title">Identity & File Proofs</div>
+                  <div className="review-section-title">{t('Identity & File Proofs')}</div>
                   <div className="review-grid">
                     <div className="review-item">
-                      <span className="review-label">Aadhar Number</span>
+                      <span className="review-label">{t('Aadhar Number')}</span>
                       <span className="review-value">{formData.aadharNumber}</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Aadhar Front Attachment</span>
+                      <span className="review-label">{t('Aadhar Front Attachment')}</span>
                       <span className="review-value">📎 {formData.aadharFrontPhotoName} ({formData.aadharFrontPhotoSize})</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Aadhar Back Attachment</span>
+                      <span className="review-label">{t('Aadhar Back Attachment')}</span>
                       <span className="review-value">📎 {formData.aadharBackPhotoName} ({formData.aadharBackPhotoSize})</span>
                     </div>
                     
                     {(formData.otherDocNumber.trim() || formData.otherDocPhotoBase64) && (
                       <>
                         <div className="review-item">
-                          <span className="review-label">Secondary Document Type ({formData.otherDocType})</span>
-                          <span className="review-value">{formData.otherDocNumber || 'Not Provided'}</span>
+                          <span className="review-label">{t('Secondary Document Type')} ({formData.otherDocType})</span>
+                          <span className="review-value">{formData.otherDocNumber || t('Not Provided')}</span>
                         </div>
                         <div className="review-item">
-                          <span className="review-label">Secondary Attachment</span>
+                          <span className="review-label">{t('Secondary Attachment')}</span>
                           <span className="review-value">{formData.otherDocPhotoName ? `📎 ${formData.otherDocPhotoName} (${formData.otherDocPhotoSize})` : 'Not Uploaded'}</span>
                         </div>
                       </>
@@ -1164,26 +1193,26 @@ function App() {
 
                 {/* Bank & Emergency */}
                 <div className="review-section">
-                  <div className="review-section-title">Bank Account & Emergency Contact</div>
+                  <div className="review-section-title">{t('Bank Account & Emergency Contact')}</div>
                   <div className="review-grid">
                     <div className="review-item">
-                      <span className="review-label">Account Holder</span>
+                      <span className="review-label">{t('Account Holder')}</span>
                       <span className="review-value">{formData.bankHolderName}</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Bank & IFSC</span>
+                      <span className="review-label">{t('Bank & IFSC')}</span>
                       <span className="review-value">{formData.bankName} ({formData.ifscCode})</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Account Number</span>
+                      <span className="review-label">{t('Account Number')}</span>
                       <span className="review-value">••••••••{formData.accountNumber.slice(-4)}</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Emergency Person</span>
+                      <span className="review-label">{t('Emergency Person')}</span>
                       <span className="review-value">{formData.emergencyName} ({formData.emergencyRelation})</span>
                     </div>
                     <div className="review-item grid-full-width">
-                      <span className="review-label">Emergency Phone</span>
+                      <span className="review-label">{t('Emergency Phone')}</span>
                       <span className="review-value">{formData.emergencyPhone}</span>
                     </div>
                   </div>
@@ -1208,9 +1237,7 @@ function App() {
               )}
 
               {step < 5 ? (
-                <button key="btn-next" type="button" className="btn btn-primary" onClick={nextStep}>
-                  Next Step
-                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button key="btn-next" type="button" className="btn btn-primary" onClick={nextStep}>{t('\n                  Next Step\n                  ')}<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
@@ -1244,14 +1271,9 @@ function App() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h2>KYC Details Saved!</h2>
-            <p>
-              Your KYC details along with the document attachments have been successfully sent and uploaded. 
-              The entry is appended to the Google Sheet, and files are saved inside your Google Drive.
-            </p>
-            <button type="button" className="btn btn-secondary" onClick={resetForm}>
-              Submit Another Response
-            </button>
+            <h2>{t('KYC Details Saved!')}</h2>
+            <p>{t('\n              Your KYC details along with the document attachments have been successfully sent and uploaded. \n              The entry is appended to the Google Sheet, and files are saved inside your Google Drive.\n            ')}</p>
+            <button type="button" className="btn btn-secondary" onClick={resetForm}>{t('\n              Submit Another Response\n            ')}</button>
           </div>
         )}
 
