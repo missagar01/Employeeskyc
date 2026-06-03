@@ -34,7 +34,8 @@ function doPost(e) {
         "Curr Street", "Curr Village", "Curr Post Office", "Curr City", "Curr Block", "Curr District", "Curr State",
         // KYC Documents
         "Aadhar Number",
-        "Aadhar Card Drive Link",
+        "Aadhar Front Drive Link",
+        "Aadhar Back Drive Link",
         "Other Document Type",
         "Other Document Number",
         "Other Document Drive Link",
@@ -50,9 +51,9 @@ function doPost(e) {
     var data = JSON.parse(e.postData.contents);
     
     // Upload files to Google Drive
-    var aadharUrl = "";
+    var aadharFrontUrl = "";
+    var aadharBackUrl = "";
     var otherDocUrl = "";
-    var signatureUrl = "";
     
     // Create/Find folder in Drive for KYC uploads
     var folderName = "Employee_KYC_Documents";
@@ -83,9 +84,14 @@ function doPost(e) {
     
     var sanitizedName = (data.fullName || "Employee").replace(/\s+/g, '_');
     
-    // Upload Mandatory Aadhar
-    if (data.aadharPhotoBase64) {
-      aadharUrl = uploadFile(data.aadharPhotoBase64, sanitizedName + "_AadharCard", data.aadharPhotoType || "image/png");
+    // Upload Mandatory Aadhar Front
+    if (data.aadharFrontPhotoBase64) {
+      aadharFrontUrl = uploadFile(data.aadharFrontPhotoBase64, sanitizedName + "_AadharFront", data.aadharFrontPhotoType || "image/png");
+    }
+    
+    // Upload Mandatory Aadhar Back
+    if (data.aadharBackPhotoBase64) {
+      aadharBackUrl = uploadFile(data.aadharBackPhotoBase64, sanitizedName + "_AadharBack", data.aadharBackPhotoType || "image/png");
     }
     
     // Upload Optional Other Document
@@ -93,8 +99,6 @@ function doPost(e) {
       var docType = (data.otherDocType || "OtherID").replace(/\s+/g, '_');
       otherDocUrl = uploadFile(data.otherDocPhotoBase64, sanitizedName + "_" + docType, data.otherDocPhotoType || "image/png");
     }
-    
-
     
     // Prepare row data
     var row = [
@@ -123,7 +127,8 @@ function doPost(e) {
       data.currState || "",
       // KYC Docs
       data.aadharNumber || "",
-      aadharUrl,
+      aadharFrontUrl,
+      aadharBackUrl,
       data.otherDocType || "",
       data.otherDocNumber || "",
       otherDocUrl,

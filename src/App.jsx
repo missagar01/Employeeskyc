@@ -72,10 +72,14 @@ function App() {
     isSameAddress: false,
     // Mandatory Aadhar Card
     aadharNumber: '',
-    aadharPhotoBase64: '',
-    aadharPhotoName: '',
-    aadharPhotoType: '',
-    aadharPhotoSize: '',
+    aadharFrontPhotoBase64: '',
+    aadharFrontPhotoName: '',
+    aadharFrontPhotoType: '',
+    aadharFrontPhotoSize: '',
+    aadharBackPhotoBase64: '',
+    aadharBackPhotoName: '',
+    aadharBackPhotoType: '',
+    aadharBackPhotoSize: '',
     // Optional Secondary Document
     otherDocType: 'PAN Card',
     otherDocNumber: '',
@@ -232,8 +236,11 @@ function App() {
       }
 
       // Validate Aadhar File Upload (Mandatory)
-      if (!formData.aadharPhotoBase64) {
-        tempErrors.aadharPhoto = 'Aadhar Card file upload is required';
+      if (!formData.aadharFrontPhotoBase64) {
+        tempErrors.aadharFrontPhoto = 'Aadhar Card Front Side upload is required';
+      }
+      if (!formData.aadharBackPhotoBase64) {
+        tempErrors.aadharBackPhoto = 'Aadhar Card Back Side upload is required';
       }
 
       // Validate Optional Secondary Document only if filled
@@ -358,10 +365,14 @@ function App() {
       currState: '',
       isSameAddress: false,
       aadharNumber: '',
-      aadharPhotoBase64: '',
-      aadharPhotoName: '',
-      aadharPhotoType: '',
-      aadharPhotoSize: '',
+      aadharFrontPhotoBase64: '',
+      aadharFrontPhotoName: '',
+      aadharFrontPhotoType: '',
+      aadharFrontPhotoSize: '',
+      aadharBackPhotoBase64: '',
+      aadharBackPhotoName: '',
+      aadharBackPhotoType: '',
+      aadharBackPhotoSize: '',
       otherDocType: 'PAN Card',
       otherDocNumber: '',
       otherDocPhotoBase64: '',
@@ -787,42 +798,80 @@ function App() {
                   {errors.aadharNumber && <span className="error-message">{errors.aadharNumber}</span>}
                 </div>
 
-                <div className="input-group grid-full-width">
-                  <label>Upload Aadhar Card Copy (JPG, PNG or PDF) <span>*</span></label>
-                  {!formData.aadharPhotoBase64 ? (
-                    <div className="upload-zone" onClick={() => document.getElementById('aadharPhotoInput').click()}>
+                <div className="input-group">
+                  <label>Aadhar Card Front Side (JPG, PNG or PDF) <span>*</span></label>
+                  {!formData.aadharFrontPhotoBase64 ? (
+                    <div className="upload-zone" onClick={() => document.getElementById('aadharFrontPhotoInput').click()}>
                       <svg className="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
-                      <p className="upload-text">Drag and drop file or <span>browse</span> to upload Aadhar</p>
+                      <p className="upload-text">Drag & drop or <span>browse</span> Front Side</p>
                       <p className="upload-hint">Max file size: 2.5 MB</p>
                       <input 
                         type="file" 
-                        id="aadharPhotoInput" 
+                        id="aadharFrontPhotoInput" 
                         accept="image/*,application/pdf"
                         style={{ display: 'none' }}
-                        onChange={(e) => handleFileChange(e, 'aadharPhoto')}
+                        onChange={(e) => handleFileChange(e, 'aadharFrontPhoto')}
                       />
                     </div>
                   ) : (
                     <div className="file-preview-card">
-                      {formData.aadharPhotoType.startsWith('image/') ? (
-                        <img src={formData.aadharPhotoBase64} alt="Aadhar preview" className="file-preview-thumb" />
+                      {formData.aadharFrontPhotoType.startsWith('image/') ? (
+                        <img src={formData.aadharFrontPhotoBase64} alt="Aadhar front preview" className="file-preview-thumb" />
                       ) : (
                         <div className="file-preview-icon">PDF</div>
                       )}
                       <div className="file-preview-info">
-                        <div className="file-preview-name">{formData.aadharPhotoName}</div>
-                        <div className="file-preview-size">{formData.aadharPhotoSize}</div>
+                        <div className="file-preview-name">{formData.aadharFrontPhotoName}</div>
+                        <div className="file-preview-size">{formData.aadharFrontPhotoSize}</div>
                       </div>
-                      <button type="button" className="btn-remove-file" onClick={() => removeFile('aadharPhoto')}>
+                      <button type="button" className="btn-remove-file" onClick={() => removeFile('aadharFrontPhoto')}>
                         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
                     </div>
                   )}
-                  {errors.aadharPhoto && <span className="error-message">{errors.aadharPhoto}</span>}
+                  {errors.aadharFrontPhoto && <span className="error-message">{errors.aadharFrontPhoto}</span>}
+                </div>
+
+                <div className="input-group">
+                  <label>Aadhar Card Back Side (JPG, PNG or PDF) <span>*</span></label>
+                  {!formData.aadharBackPhotoBase64 ? (
+                    <div className="upload-zone" onClick={() => document.getElementById('aadharBackPhotoInput').click()}>
+                      <svg className="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <p className="upload-text">Drag & drop or <span>browse</span> Back Side</p>
+                      <p className="upload-hint">Max file size: 2.5 MB</p>
+                      <input 
+                        type="file" 
+                        id="aadharBackPhotoInput" 
+                        accept="image/*,application/pdf"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleFileChange(e, 'aadharBackPhoto')}
+                      />
+                    </div>
+                  ) : (
+                    <div className="file-preview-card">
+                      {formData.aadharBackPhotoType.startsWith('image/') ? (
+                        <img src={formData.aadharBackPhotoBase64} alt="Aadhar back preview" className="file-preview-thumb" />
+                      ) : (
+                        <div className="file-preview-icon">PDF</div>
+                      )}
+                      <div className="file-preview-info">
+                        <div className="file-preview-name">{formData.aadharBackPhotoName}</div>
+                        <div className="file-preview-size">{formData.aadharBackPhotoSize}</div>
+                      </div>
+                      <button type="button" className="btn-remove-file" onClick={() => removeFile('aadharBackPhoto')}>
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  {errors.aadharBackPhoto && <span className="error-message">{errors.aadharBackPhoto}</span>}
                 </div>
 
                 {/* Section B: Other Document (Optional) */}
@@ -1088,8 +1137,12 @@ function App() {
                       <span className="review-value">{formData.aadharNumber}</span>
                     </div>
                     <div className="review-item">
-                      <span className="review-label">Aadhar Attachment</span>
-                      <span className="review-value">📎 {formData.aadharPhotoName} ({formData.aadharPhotoSize})</span>
+                      <span className="review-label">Aadhar Front Attachment</span>
+                      <span className="review-value">📎 {formData.aadharFrontPhotoName} ({formData.aadharFrontPhotoSize})</span>
+                    </div>
+                    <div className="review-item">
+                      <span className="review-label">Aadhar Back Attachment</span>
+                      <span className="review-value">📎 {formData.aadharBackPhotoName} ({formData.aadharBackPhotoSize})</span>
                     </div>
                     
                     {(formData.otherDocNumber.trim() || formData.otherDocPhotoBase64) && (
