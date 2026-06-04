@@ -52,6 +52,8 @@ function App() {
   const [formData, setFormData] = useState({
     fullName: '',
     employeeCode: '',
+    department: '',
+    designation: '',
     email: '',
     phone: '',
     dob: '',
@@ -235,6 +237,8 @@ function App() {
         tempErrors.dob = t('Enter date in DD/MM/YYYY format');
       }
       if (!formData.gender) tempErrors.gender = 'Gender is required';
+      if (!formData.department.trim()) tempErrors.department = 'Department is required';
+      if (!formData.designation.trim()) tempErrors.designation = 'Designation is required';
     } 
     
     else if (step === 2) {
@@ -374,6 +378,8 @@ function App() {
     setFormData({
       fullName: '',
       employeeCode: '',
+      department: '',
+      designation: '',
       email: '',
       phone: '',
       dob: '',
@@ -498,6 +504,34 @@ function App() {
                     onChange={handleInputChange}
                   />
                   {errors.employeeCode && <span className="error-message">{errors.employeeCode}</span>}
+                </div>
+
+                <div className="input-group">
+                  <label htmlFor="department">{t('Department ')}<span>*</span></label>
+                  <input
+                    type="text"
+                    id="department"
+                    name="department"
+                    placeholder="Enter your Department (e.g. IT, HR)"
+                    className={`input-field ${errors.department ? 'input-error' : ''}`}
+                    value={formData.department}
+                    onChange={handleInputChange}
+                  />
+                  {errors.department && <span className="error-message">{errors.department}</span>}
+                </div>
+
+                <div className="input-group">
+                  <label htmlFor="designation">{t('Designation ')}<span>*</span></label>
+                  <input
+                    type="text"
+                    id="designation"
+                    name="designation"
+                    placeholder="Enter your Designation (e.g. Software Engineer)"
+                    className={`input-field ${errors.designation ? 'input-error' : ''}`}
+                    value={formData.designation}
+                    onChange={handleInputChange}
+                  />
+                  {errors.designation && <span className="error-message">{errors.designation}</span>}
                 </div>
 
                 <div className="input-group">
@@ -1114,6 +1148,14 @@ function App() {
                     <div className="review-item">
                       <span className="review-label">{t('Employee Code')}</span>
                       <span className="review-value">{formData.employeeCode}</span>
+                    </div>
+                    <div className="review-item">
+                      <span className="review-label">{t('Department')}</span>
+                      <span className="review-value">{formData.department}</span>
+                    </div>
+                    <div className="review-item">
+                      <span className="review-label">{t('Designation')}</span>
+                      <span className="review-value">{formData.designation}</span>
                     </div>
                     <div className="review-item">
                       <span className="review-label">{t('Email Address')}</span>

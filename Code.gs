@@ -24,6 +24,8 @@ function doPost(e) {
         "Timestamp", 
         "Full Name", 
         "Employee Code",
+        "Department",
+        "Designation",
         "Email", 
         "Phone", 
         "Date of Birth", 
@@ -105,6 +107,8 @@ function doPost(e) {
       new Date(), // Timestamp
       data.fullName || "",
       data.employeeCode || "",
+      data.department || "",
+      data.designation || "",
       data.email || "",
       data.phone || "",
       data.dob || "",
