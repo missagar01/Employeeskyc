@@ -51,6 +51,7 @@ function App() {
   
   const [formData, setFormData] = useState({
     fullName: '',
+    fatherName: '',
     employeeCode: '',
     department: '',
     designation: '',
@@ -223,6 +224,9 @@ function App() {
       if (!formData.fullName.trim()) tempErrors.fullName = 'Full Name is required';
       else if (formData.fullName.trim().length < 3) tempErrors.fullName = 'Name must be at least 3 characters';
       
+      if (!formData.fatherName.trim()) tempErrors.fatherName = "Father's Name is required";
+      else if (formData.fatherName.trim().length < 3) tempErrors.fatherName = "Father's Name must be at least 3 characters";
+      
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (formData.email.trim() && !emailRegex.test(formData.email)) tempErrors.email = 'Enter a valid email address';
       
@@ -377,6 +381,7 @@ function App() {
   const resetForm = () => {
     setFormData({
       fullName: '',
+      fatherName: '',
       employeeCode: '',
       department: '',
       designation: '',
@@ -490,6 +495,20 @@ function App() {
                     onChange={handleInputChange}
                   />
                   {errors.fullName && <span className="error-message">{errors.fullName}</span>}
+                </div>
+
+                <div className="input-group grid-full-width">
+                  <label htmlFor="fatherName">{t("Father's Name ")}<span>*</span></label>
+                  <input
+                    type="text"
+                    id="fatherName"
+                    name="fatherName"
+                    placeholder="Enter your father's full name"
+                    className={`input-field ${errors.fatherName ? 'input-error' : ''}`}
+                    value={formData.fatherName}
+                    onChange={handleInputChange}
+                  />
+                  {errors.fatherName && <span className="error-message">{errors.fatherName}</span>}
                 </div>
 
                 <div className="input-group grid-full-width">
@@ -1144,6 +1163,10 @@ function App() {
                     <div className="review-item">
                       <span className="review-label">{t('Full Name')}</span>
                       <span className="review-value">{formData.fullName}</span>
+                    </div>
+                    <div className="review-item">
+                      <span className="review-label">{t("Father's Name")}</span>
+                      <span className="review-value">{formData.fatherName}</span>
                     </div>
                     <div className="review-item">
                       <span className="review-label">{t('Employee Code')}</span>

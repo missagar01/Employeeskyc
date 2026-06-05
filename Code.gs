@@ -23,6 +23,7 @@ function doPost(e) {
       var headers = [
         "Timestamp", 
         "Full Name", 
+        "Father's Name",
         "Employee Code",
         "Department",
         "Designation",
@@ -106,6 +107,7 @@ function doPost(e) {
     var row = [
       new Date(), // Timestamp
       data.fullName || "",
+      data.fatherName || "",
       data.employeeCode || "",
       data.department || "",
       data.designation || "",
