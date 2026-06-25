@@ -48,7 +48,7 @@ function App() {
   const [scriptUrl, setScriptUrl] = useState(() => {
     return import.meta.env.VITE_GOOGLE_SCRIPT_URL || localStorage.getItem('kyc_script_url') || '/api/kyc';
   });
-  
+
   const [formData, setFormData] = useState({
     fullName: '',
     fatherName: '',
@@ -128,7 +128,7 @@ function App() {
       }));
     }
   }, [
-    formData.isSameAddress, 
+    formData.isSameAddress,
     formData.permStreet,
     formData.permVillage,
     formData.permPostOffice,
@@ -150,7 +150,7 @@ function App() {
       // Auto-format as DD/MM/YYYY
       let cleaned = value.replace(/\D/g, '');
       if (cleaned.length > 8) cleaned = cleaned.slice(0, 8);
-      
+
       if (cleaned.length >= 5) {
         value = `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4)}`;
       } else if (cleaned.length >= 3) {
@@ -164,7 +164,7 @@ function App() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     // Clear validation error on change
     const hasError = Object.entries(errors).some(([key, val]) => key === name && val);
     if (hasError) {
@@ -218,22 +218,22 @@ function App() {
   // Step Validations
   const validateStep = () => {
     const tempErrors = {};
-    
+
     if (step === 1) {
       if (!formData.employeeCode.trim()) tempErrors.employeeCode = 'Employee Code is required';
       if (!formData.fullName.trim()) tempErrors.fullName = 'Full Name is required';
       else if (formData.fullName.trim().length < 3) tempErrors.fullName = 'Name must be at least 3 characters';
-      
+
       if (!formData.fatherName.trim()) tempErrors.fatherName = "Father's Name is required";
       else if (formData.fatherName.trim().length < 3) tempErrors.fatherName = "Father's Name must be at least 3 characters";
-      
+
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (formData.email.trim() && !emailRegex.test(formData.email)) tempErrors.email = 'Enter a valid email address';
-      
+
       const phoneRegex = /^[6-9]\d{9}$/;
       if (!formData.phone.trim()) tempErrors.phone = 'Phone number is required';
       else if (!phoneRegex.test(formData.phone)) tempErrors.phone = 'Enter a valid 10-digit mobile number';
-      
+
       const dobRegex = /^(((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((19|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[469]|11)\/((19|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((19|[2-9]\d)\d{2}))|(29\/02\/((19|[2-9]\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))))$/;
       if (!formData.dob) {
         tempErrors.dob = t('Date of birth is required');
@@ -243,8 +243,8 @@ function App() {
       if (!formData.gender) tempErrors.gender = 'Gender is required';
       if (!formData.department.trim()) tempErrors.department = 'Department is required';
       if (!formData.designation.trim()) tempErrors.designation = 'Designation is required';
-    } 
-    
+    }
+
     else if (step === 2) {
       // Permanent Address
       if (!formData.permStreet.trim()) tempErrors.permStreet = 'Street Address is required';
@@ -252,7 +252,7 @@ function App() {
       if (!formData.permCity.trim()) tempErrors.permCity = 'City is required';
       if (!formData.permDistrict.trim()) tempErrors.permDistrict = 'District is required';
       if (!formData.permState.trim()) tempErrors.permState = 'State is required';
-      
+
       // Current Address
       if (!formData.isSameAddress) {
         if (!formData.currStreet.trim()) tempErrors.currStreet = 'Street Address is required';
@@ -261,8 +261,8 @@ function App() {
         if (!formData.currDistrict.trim()) tempErrors.currDistrict = 'District is required';
         if (!formData.currState.trim()) tempErrors.currState = 'State is required';
       }
-    } 
-    
+    }
+
     else if (step === 3) {
       // Validate Aadhar Number (Mandatory: 12 digits)
       const aadharClean = formData.aadharNumber.replace(/\s/g, '');
@@ -290,28 +290,28 @@ function App() {
             tempErrors.otherDocNumber = 'Invalid PAN Card Format (e.g. ABCDE1234F)';
           }
         }
-        
+
         if (!formData.otherDocPhotoBase64) {
           tempErrors.otherDocPhoto = 'Please upload the document copy';
         }
       }
-    } 
-    
+    }
+
     else if (step === 4) {
       if (!formData.bankHolderName.trim()) tempErrors.bankHolderName = 'Account holder name is required';
       if (!formData.bankName.trim()) tempErrors.bankName = 'Bank name is required';
       if (!formData.accountNumber.trim()) tempErrors.accountNumber = 'Account number is required';
       else if (!/^\d{9,18}$/.test(formData.accountNumber)) tempErrors.accountNumber = 'Invalid account number (9 to 18 digits)';
-      
+
       const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
       if (!formData.ifscCode.trim()) tempErrors.ifscCode = 'IFSC Code is required';
       else if (!ifscRegex.test(formData.ifscCode.toUpperCase())) {
         tempErrors.ifscCode = 'Invalid IFSC Format (e.g. SBIN0001234)';
       }
-      
+
       if (!formData.emergencyName.trim()) tempErrors.emergencyName = 'Contact name is required';
       if (!formData.emergencyRelation.trim()) tempErrors.emergencyRelation = 'Relationship is required';
-      
+
       const phoneRegex = /^[6-9]\d{9}$/;
       if (!formData.emergencyPhone.trim()) tempErrors.emergencyPhone = 'Emergency phone is required';
       else if (!phoneRegex.test(formData.emergencyPhone)) tempErrors.emergencyPhone = 'Enter a valid 10-digit number';
@@ -436,7 +436,7 @@ function App() {
   return (
     <div className="kyc-container">
       <div className="kyc-content">
-        
+
         {/* Header */}
         <div className="kyc-header">
           <h1>{t('Employee KYC Portal')}</h1>
@@ -447,27 +447,27 @@ function App() {
         {step <= 5 && (
           <div className="kyc-steps">
             <div className="kyc-steps-progress" style={{ width: `${progressPercent}%` }}></div>
-            
+
             <div className={`step-node ${step >= 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`} onClick={() => step < 5 && setStep(1)}>
               {step > 1 ? '✓' : '1'}
               <span className="step-node-label">{t('Personal')}</span>
             </div>
-            
+
             <div className={`step-node ${step >= 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`} onClick={() => step < 5 && validateStep() && setStep(2)}>
               {step > 2 ? '✓' : '2'}
               <span className="step-node-label">{t('Address')}</span>
             </div>
-            
+
             <div className={`step-node ${step >= 3 ? 'active' : ''} ${step > 3 ? 'completed' : ''}`} onClick={() => step < 5 && validateStep() && setStep(3)}>
               {step > 3 ? '✓' : '3'}
               <span className="step-node-label">{t('Identity')}</span>
             </div>
-            
+
             <div className={`step-node ${step >= 4 ? 'active' : ''} ${step > 4 ? 'completed' : ''}`} onClick={() => step < 5 && validateStep() && setStep(4)}>
               {step > 4 ? '✓' : '4'}
               <span className="step-node-label">{t('Bank & Emergency')}</span>
             </div>
-            
+
             <div className={`step-node ${step === 5 ? 'active' : ''}`} onClick={() => step < 5 && validateStep() && setStep(5)}>
               5
               <span className="step-node-label">{t('Review')}</span>
@@ -477,12 +477,12 @@ function App() {
 
         {/* Form Screens */}
         <form onSubmit={handleSubmit}>
-          
+
           {/* STEP 1: Personal Information */}
           {step === 1 && (
             <div className="form-section">
               <div className="form-grid">
-                
+
                 <div className="input-group grid-full-width">
                   <label htmlFor="fullName">{t('Full Name ')}<span>*</span></label>
                   <input
@@ -622,7 +622,7 @@ function App() {
           {step === 2 && (
             <div className="form-section">
               <div className="form-grid">
-                
+
                 {/* Permanent Address Breakdown */}
                 <div className="input-group grid-full-width">
                   <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.5rem' }}>{t('Permanent Address')}</h3>
@@ -732,11 +732,11 @@ function App() {
                 {/* Same Address Switch */}
                 <div className="checkbox-group grid-full-width" style={{ marginTop: '1.25rem', marginBottom: '1.25rem' }}>
                   <label className="checkbox-container">{t('\n                    Current Address is same as Permanent Address\n                    ')}<input
-                      type="checkbox"
-                      name="isSameAddress"
-                      checked={formData.isSameAddress}
-                      onChange={handleInputChange}
-                    />
+                    type="checkbox"
+                    name="isSameAddress"
+                    checked={formData.isSameAddress}
+                    onChange={handleInputChange}
+                  />
                     <span className="checkmark"></span>
                   </label>
                 </div>
@@ -859,7 +859,7 @@ function App() {
           {step === 3 && (
             <div className="form-section">
               <div className="form-grid">
-                
+
                 {/* Section A: Aadhar Card (Mandatory) */}
                 <div className="input-group grid-full-width">
                   <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>{t('Aadhar Card Verification (Mandatory)')}</h3>
@@ -889,9 +889,9 @@ function App() {
                       </svg>
                       <p className="upload-text">{t('Drag & drop or ')}<span>{t('browse')}</span>{t(' Front Side')}</p>
                       <p className="upload-hint">{t('Max file size: 2.5 MB')}</p>
-                      <input 
-                        type="file" 
-                        id="aadharFrontPhotoInput" 
+                      <input
+                        type="file"
+                        id="aadharFrontPhotoInput"
                         accept="image/*,application/pdf"
                         style={{ display: 'none' }}
                         onChange={(e) => handleFileChange(e, 'aadharFrontPhoto')}
@@ -927,9 +927,9 @@ function App() {
                       </svg>
                       <p className="upload-text">{t('Drag & drop or ')}<span>{t('browse')}</span>{t(' Back Side')}</p>
                       <p className="upload-hint">{t('Max file size: 2.5 MB')}</p>
-                      <input 
-                        type="file" 
-                        id="aadharBackPhotoInput" 
+                      <input
+                        type="file"
+                        id="aadharBackPhotoInput"
                         accept="image/*,application/pdf"
                         style={{ display: 'none' }}
                         onChange={(e) => handleFileChange(e, 'aadharBackPhoto')}
@@ -999,9 +999,9 @@ function App() {
                       </svg>
                       <p className="upload-text">{t('Drag and drop file or ')}<span>{t('browse')}</span>{t(' to upload secondary proof')}</p>
                       <p className="upload-hint">{t('Max file size: 2.5 MB')}</p>
-                      <input 
-                        type="file" 
-                        id="otherDocInput" 
+                      <input
+                        type="file"
+                        id="otherDocInput"
                         accept="image/*,application/pdf"
                         style={{ display: 'none' }}
                         onChange={(e) => handleFileChange(e, 'otherDocPhoto')}
@@ -1037,7 +1037,7 @@ function App() {
           {step === 4 && (
             <div className="form-section">
               <div className="form-grid">
-                
+
                 <div className="input-group grid-full-width">
                   <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>{t('Bank Salary Details')}</h3>
                 </div>
@@ -1155,7 +1155,7 @@ function App() {
           {step === 5 && (
             <div className="form-section">
               <div className="review-summary">
-                
+
                 {/* Personal Section */}
                 <div className="review-section">
                   <div className="review-section-title">{t('Personal Details')}</div>
@@ -1238,7 +1238,7 @@ function App() {
                       <span className="review-label">{t('Aadhar Back Attachment')}</span>
                       <span className="review-value">📎 {formData.aadharBackPhotoName} ({formData.aadharBackPhotoSize})</span>
                     </div>
-                    
+
                     {(formData.otherDocNumber.trim() || formData.otherDocPhotoBase64) && (
                       <>
                         <div className="review-item">
@@ -1303,8 +1303,8 @@ function App() {
 
               {step < 5 ? (
                 <button key="btn-next" type="button" className="btn btn-primary" onClick={nextStep}>{t('\n                  Next Step\n                  ')}<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                </svg>
                 </button>
               ) : (
                 <button key="btn-submit" type="submit" className="btn btn-primary" disabled={isSubmitting || !scriptUrl}>
@@ -1327,7 +1327,6 @@ function App() {
           )}
 
         </form>
-
         {/* STEP 6: Success Screen */}
         {step === 6 && (
           <div className="success-screen">
@@ -1337,11 +1336,27 @@ function App() {
               </svg>
             </div>
             <h2>{t('KYC Details Saved!')}</h2>
-            <p>{t('\n              Your KYC details along with the document attachments have been successfully sent and uploaded. \n              The entry is appended to the Google Sheet, and files are saved inside your Google Drive.\n            ')}</p>
+
+            {/* Yahan par Submitted Employee Details dikhayi jayengi */}
+            <div className="submitted-details" style={{
+              backgroundColor: 'rgba(255,255,255,0.05)',
+              padding: '1.25rem',
+              borderRadius: '8px',
+              margin: '1.5rem 0',
+              textAlign: 'center'
+            }}>
+              <p style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem' }}>
+                <span style={{ color: 'var(--primary)', opacity: 0.8 }}>Employee Name:</span> <strong>{formData.fullName}</strong>
+              </p>
+              <p style={{ margin: '0', fontSize: '1.1rem' }}>
+                <span style={{ color: 'var(--primary)', opacity: 0.8 }}>Employee Code:</span> <strong>{formData.employeeCode}</strong>
+              </p>
+            </div>
+
+            <p>{t('\n              Your KYC details along with the document attachments have been successfully sent and uploaded. \n              The entry is appended to the Sagar Pipes Database.\n            ')}</p>
             <button type="button" className="btn btn-secondary" onClick={resetForm}>{t('\n              Submit Another Response\n            ')}</button>
           </div>
         )}
-
       </div>
     </div>
   );
