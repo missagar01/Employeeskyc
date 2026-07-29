@@ -17,38 +17,45 @@ function doPost(e) {
   
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    
+
+    // Default header order - only used when the sheet is empty (first run)
+    var defaultHeaders = [
+      "Timestamp",
+      "Full Name",
+      "Father's Name",
+      "Employee Code",
+      "Department",
+      "Designation",
+      "Email",
+      "Phone",
+      "Date of Birth",
+      "Gender",
+      // Permanent Address
+      "Perm Street", "Perm Village", "Perm Post Office", "Perm City", "Perm Block", "Perm District", "Perm State",
+      // Current Address
+      "Curr Street", "Curr Village", "Curr Post Office", "Curr City", "Curr Block", "Curr District", "Curr State",
+      // KYC Documents
+      "Aadhar Number",
+      "Aadhar Front Drive Link",
+      "Aadhar Back Drive Link",
+      "Other Document Type",
+      "Other Document Number",
+      "Other Document Drive Link",
+      // Bank Details
+      "Bank Account Holder", "Bank Name", "Account Number", "IFSC Code",
+      // Emergency Details
+      "Emergency Contact Name", "Emergency Contact Relation", "Emergency Contact Phone"
+    ];
+
     // Check if sheet is empty and write headers if it is
     if (sheet.getLastRow() === 0) {
-      var headers = [
-        "Timestamp", 
-        "Full Name", 
-        "Father's Name",
-        "Employee Code",
-        "Department",
-        "Designation",
-        "Email", 
-        "Phone", 
-        "Date of Birth", 
-        "Gender", 
-        // Permanent Address
-        "Perm Street", "Perm Village", "Perm Post Office", "Perm City", "Perm Block", "Perm District", "Perm State",
-        // Current Address
-        "Curr Street", "Curr Village", "Curr Post Office", "Curr City", "Curr Block", "Curr District", "Curr State",
-        // KYC Documents
-        "Aadhar Number",
-        "Aadhar Front Drive Link",
-        "Aadhar Back Drive Link",
-        "Other Document Type",
-        "Other Document Number",
-        "Other Document Drive Link",
-        // Bank Details
-        "Bank Account Holder", "Bank Name", "Account Number", "IFSC Code", 
-        // Emergency Details
-        "Emergency Contact Name", "Emergency Contact Relation", "Emergency Contact Phone"
-      ];
-      sheet.appendRow(headers);
+      sheet.appendRow(defaultHeaders);
     }
+
+    // Always read the ACTUAL headers currently in row 1, in their current
+    // left-to-right order. If someone reorders/inserts columns in the sheet,
+    // this reflects that new order instead of assuming the default one.
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     
     // Parse incoming data
     var data = JSON.parse(e.postData.contents);
@@ -103,51 +110,59 @@ function doPost(e) {
       otherDocUrl = uploadFile(data.otherDocPhotoBase64, sanitizedName + "_" + docType, data.otherDocPhotoType || "image/png");
     }
     
-    // Prepare row data
-    var row = [
-      new Date(), // Timestamp
-      data.fullName || "",
-      data.fatherName || "",
-      data.employeeCode || "",
-      data.department || "",
-      data.designation || "",
-      data.email || "",
-      data.phone || "",
-      data.dob || "",
-      data.gender || "",
+    // Map of header name -> value. Keys must match the header text exactly
+    // (see defaultHeaders above). This is looked up by NAME, not position,
+    // so reordering/inserting columns in the sheet won't misalign data.
+    var valueByHeader = {
+      "Timestamp": new Date(),
+      "Full Name": data.fullName || "",
+      "Father's Name": data.fatherName || "",
+      "Employee Code": data.employeeCode || "",
+      "Department": data.department || "",
+      "Designation": data.designation || "",
+      "Email": data.email || "",
+      "Phone": data.phone || "",
+      "Date of Birth": data.dob || "",
+      "Gender": data.gender || "",
       // Permanent Address
-      data.permStreet || "",
-      data.permVillage || "",
-      data.permPostOffice || "",
-      data.permCity || "",
-      data.permBlock || "",
-      data.permDistrict || "",
-      data.permState || "",
+      "Perm Street": data.permStreet || "",
+      "Perm Village": data.permVillage || "",
+      "Perm Post Office": data.permPostOffice || "",
+      "Perm City": data.permCity || "",
+      "Perm Block": data.permBlock || "",
+      "Perm District": data.permDistrict || "",
+      "Perm State": data.permState || "",
       // Current Address
-      data.currStreet || "",
-      data.currVillage || "",
-      data.currPostOffice || "",
-      data.currCity || "",
-      data.currBlock || "",
-      data.currDistrict || "",
-      data.currState || "",
+      "Curr Street": data.currStreet || "",
+      "Curr Village": data.currVillage || "",
+      "Curr Post Office": data.currPostOffice || "",
+      "Curr City": data.currCity || "",
+      "Curr Block": data.currBlock || "",
+      "Curr District": data.currDistrict || "",
+      "Curr State": data.currState || "",
       // KYC Docs
-      data.aadharNumber || "",
-      aadharFrontUrl,
-      aadharBackUrl,
-      data.otherDocType || "",
-      data.otherDocNumber || "",
-      otherDocUrl,
+      "Aadhar Number": data.aadharNumber || "",
+      "Aadhar Front Drive Link": aadharFrontUrl,
+      "Aadhar Back Drive Link": aadharBackUrl,
+      "Other Document Type": data.otherDocType || "",
+      "Other Document Number": data.otherDocNumber || "",
+      "Other Document Drive Link": otherDocUrl,
       // Bank & Emergency
-      data.bankHolderName || "",
-      data.bankName || "",
-      data.accountNumber || "",
-      data.ifscCode || "",
-      data.emergencyName || "",
-      data.emergencyRelation || "",
-      data.emergencyPhone || ""
-    ];
-    
+      "Bank Account Holder": data.bankHolderName || "",
+      "Bank Name": data.bankName || "",
+      "Account Number": data.accountNumber || "",
+      "IFSC Code": data.ifscCode || "",
+      "Emergency Contact Name": data.emergencyName || "",
+      "Emergency Contact Relation": data.emergencyRelation || "",
+      "Emergency Contact Phone": data.emergencyPhone || ""
+    };
+
+    // Build the row in the SAME order as the sheet's actual current headers.
+    // Any header not recognized (e.g. a manually added extra column) is left blank.
+    var row = headers.map(function (headerName) {
+      return valueByHeader.hasOwnProperty(headerName) ? valueByHeader[headerName] : "";
+    });
+
     sheet.appendRow(row);
     
     return ContentService.createTextOutput(JSON.stringify({ 
